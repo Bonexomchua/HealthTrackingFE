@@ -22,7 +22,7 @@ export default function CalendarScreen() {
     for (let i = 6; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
-      days.push(d.toISOString().split("T")[0]);
+      days.push(d.toLocaleDateString("sv-SE"));
     }
     return days;
   };
@@ -44,23 +44,23 @@ export default function CalendarScreen() {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
-
+      console.log(resWater.data);
       const waterGrouped = {};
       resWater.data.forEach((w) => {
-        const dateKey = w.date.split("T")[0];
+        const dateKey = new Date(w.date).toLocaleDateString("sv-SE");
         waterGrouped[dateKey] = (waterGrouped[dateKey] || 0) + w.amount;
       });
 
       const exerciseGrouped = {};
       resExercise.data.forEach((e) => {
-        const dateKey = e.date.split("T")[0];
+        const dateKey = new Date(e.date).toLocaleDateString("sv-SE");
         exerciseGrouped[dateKey] =
           (exerciseGrouped[dateKey] || 0) + e.duration;
       });
 
       const sleepGrouped = {};
       resSleep.data.forEach((s) => {
-        const dateKey = s.date.split("T")[0];
+        const dateKey = new Date(s.date).toLocaleDateString("sv-SE");
         const start = new Date(s.timeStart);
         const end = new Date(s.timeEnd);
         const hours = (end - start) / 3600000;
@@ -148,8 +148,8 @@ export default function CalendarScreen() {
           {avgSleep < 6
             ? "⚠️ Ngủ quá ít"
             : avgSleep > 9
-            ? "⚠️ Ngủ quá nhiều"
-            : ""}
+              ? "⚠️ Ngủ quá nhiều"
+              : ""}
         </Text>
       </View>
     </ScrollView>

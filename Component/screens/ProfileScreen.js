@@ -27,6 +27,34 @@ export default function ProfileScreen({ navigation }) {
     const [inputWeight, setInputWeight] = useState('');
     const [inputHeight, setInputHeight] = useState('');
 
+    //Khai báo setting mặc định
+    const defaultSettings = [
+        {
+            id: -1,
+            settingName: "Cơ bản(mặc định)",
+            waterAmount: 2000,
+            exerciseDuration: 30,
+            exerciseRate: 2,
+            food: ["Ăn đủ chất"]
+        },
+        {
+            id: -2,
+            settingName: "Giảm cân(mặc định)",
+            waterAmount: 2500,
+            exerciseDuration: 45,
+            exerciseRate: 7,
+            food: ["Hạn chế đồ chiên, nướng, đồ ngọt", "Ưu tiên trứng, rau xanh, thịt nạc, cá hồi"]
+        },
+        {
+            id: -3,
+            settingName: "Tăng cân(mặc định)",
+            waterAmount: 1500,
+            exerciseDuration: 20,
+            exerciseRate: 4,
+            food: ["Ăn thịt đỏ, cá, trứng, sữa, trái bơ", "Chia nhiều bữa nhỏ"]
+        },
+    ];
+
     if (Platform.OS === 'android') {
         UIManager.setLayoutAnimationEnabledExperimental &&
             UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -37,11 +65,15 @@ export default function ProfileScreen({ navigation }) {
         try {
             const token = await AsyncStorage.getItem('accessToken');
             const savedSettingId = await AsyncStorage.getItem('settingId');
-            const savedAvatar = await AsyncStorage.getItem('avatar'); // lấy avatar từ storage
+            const savedAvatar = await AsyncStorage.getItem('avatar');
             setAvatarUrl(savedAvatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png");
 
+            // Nếu chưa có settingId thì mặc định chọn -1
             if (savedSettingId) {
                 setCurrentSettingId(Number(savedSettingId));
+            } else {
+                setCurrentSettingId(-1);
+                await AsyncStorage.setItem('settingId', String(-1));
             }
 
             if (!token) {
@@ -68,13 +100,13 @@ export default function ProfileScreen({ navigation }) {
             setHeight(h);
             setBmi(w && h ? (w / Math.pow(h / 100, 2)).toFixed(1) : null);
 
-            // Lấy settings
+            // Lấy settings từ API rồi merge với default
             const settingsUrl = BASE_URL + endpoints['getallsetting'];
             const resSettings = await axios.get(settingsUrl, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            setSettings(resSettings.data);
+            setSettings([...defaultSettings, ...resSettings.data]);
 
         } catch (error) {
             console.error('Error fetching data:', error.message || error);
@@ -82,6 +114,7 @@ export default function ProfileScreen({ navigation }) {
             setLoading(false);
         }
     }, []);
+
 
     const pickImage = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -148,6 +181,14 @@ export default function ProfileScreen({ navigation }) {
 
     const updateCurrentSetting = async (id) => {
         try {
+            // Nếu id là setting mặc định (id < 0) thì chỉ đổi local, không gọi API
+            if (id < 0) {
+                setCurrentSettingId(id);
+                await AsyncStorage.setItem('settingId', String(id));
+                alert("Đã chọn setting mặc định!");
+                return;
+            }
+
             const token = await AsyncStorage.getItem('accessToken');
             const url = BASE_URL + endpoints['updatecurrentsetting'];
 
@@ -162,12 +203,17 @@ export default function ProfileScreen({ navigation }) {
                 await AsyncStorage.setItem('settingWater', String(selectedSetting.waterAmount));
             }
             setCurrentSettingId(id);
+            navigation.reset({
+                index: 0,
+                routes: [{ name: "Main" }], // màn hình gốc app
+            });
             alert("Cập nhật setting thành công!");
         } catch (error) {
             console.error('Error updating setting:', error.message || error);
             alert("Cập nhật thất bại!");
         }
     };
+
 
     const createMetric = async () => {
         try {
@@ -297,7 +343,14 @@ export default function ProfileScreen({ navigation }) {
 
                 <Pressable
                     style={styles.button}
-                    onPress={() => navigation.navigate('Login')}
+                    onPress={async () => {
+                        try {
+                            await AsyncStorage.clear(); // 🔥 xóa sạch dữ liệu trong AsyncStorage
+                            navigation.navigate('Login');
+                        } catch (e) {
+                            console.error('Lỗi khi clear AsyncStorage:', e);
+                        }
+                    }}
                 >
                     <Text style={styles.buttonText}>Logout</Text>
                 </Pressable>

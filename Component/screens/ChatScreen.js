@@ -20,16 +20,18 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { serverTimestamp } from "firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ChatScreen({ route }) {
   const { conversationId, expertName } = route.params;
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [currentUserUid, setCurrentUserUid] = useState(null);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUid = async () => {
-      const uid = await AsyncStorage.getItem("userUid");
+      const uid = await AsyncStorage.getItem("UID");
       setCurrentUserUid(uid);
     };
     fetchUid();
@@ -93,6 +95,9 @@ export default function ChatScreen({ route }) {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.header}>
+        <Pressable onPress={() => navigation.goBack()}>
+          <Text style={{ color: "#fff", fontSize: 16, marginRight: 10 }}>⬅ Back</Text>
+        </Pressable>
         <Text style={styles.headerText}>{expertName}</Text>
       </View>
 

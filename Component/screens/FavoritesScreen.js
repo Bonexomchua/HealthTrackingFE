@@ -71,6 +71,7 @@ export default function FavoritesScreen() {
               const currentUserUid = await AsyncStorage.getItem("UID"); // UID thật của user
               const expertUid = item.id; // UID chuyên gia từ API
 
+              console.log(currentUserUid, expertUid);
 
               const convRef = await getOrCreateConversation(
                 currentUserUid,

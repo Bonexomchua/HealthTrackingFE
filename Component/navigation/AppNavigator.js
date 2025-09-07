@@ -7,6 +7,8 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ExpertScreen from '../screens/ExpertScreen';
 import RegisterStep2Screen from '../screens/RegisterStep2Screen';
 import ChatScreen from '../screens/ChatScreen';
+import FavoritesScreen from '../screens/FavoritesScreen';
+import ExpertChatScreen from '../screens/ExpertChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +22,8 @@ export default function AppNavigator() {
         <Stack.Screen name="ExpertScreen" component={ExpertScreen} />
         <Stack.Screen name="RegisterStep2" component={RegisterStep2Screen} />
         <Stack.Screen name="ChatScreen" component={ChatScreen}/>
+        <Stack.Screen name="FavoritesScreen" component={FavoritesScreen}/>
+        <Stack.Screen name="ExpertChatScreen" component={ExpertChatScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

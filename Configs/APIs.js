@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = 'http://192.168.1.116:5260/api/';
+export const BASE_URL = 'http://192.168.1.194:5260/api/';
 
 export const endpoints = {
     'user': 'users/',
@@ -9,6 +9,7 @@ export const endpoints = {
     'profile': 'profiles/',
     'event': 'events/',
     'usermanagement': 'admin-users/',
+    'getusernamebyids': 'AppUser/get-username-by-ids/',
 
     //WATER
     'getcurrwater': 'Water/get-current-water/',
@@ -24,6 +25,7 @@ export const endpoints = {
     //EXERCISE
     'updateexercise': 'Exercise/update-ex',
     'getallexercise': 'Exercise/get-user-exercise',
+    'getallexercisea': 'Exercise/get-user-exercisea',
     'createactivity': 'Exercise/create-activity',
     'getuseractivity': 'Exercise/get-user-activity',
     //SLEEP
